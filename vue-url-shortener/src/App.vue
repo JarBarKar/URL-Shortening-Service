@@ -79,6 +79,11 @@ export default {
   },
   methods: {
     fetchShortUrl() {
+      if (this.original_url === "" || !this.original_url.endsWith(".com")) {
+        this.original_url = "";
+        return;
+      }
+      console.log(!this.original_url.endsWith(".com"));
       const requestOptions = {
         method: "POST",
         headers: { "Content-Type": "application/json" },
