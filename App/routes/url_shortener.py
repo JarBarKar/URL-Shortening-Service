@@ -1,7 +1,7 @@
 from ..extensions import db
 from datetime import datetime
 from ..models import UrlShortener
-from flask import Flask, request, jsonify, Blueprint, redirect
+from flask import Flask, request, jsonify, Blueprint, redirect, render_template
 
 
 url_shortener_blueprint = Blueprint('url_shortener', __name__)
@@ -11,19 +11,23 @@ url_shortener_blueprint = Blueprint('url_shortener', __name__)
 
 @url_shortener_blueprint.route("/add_url", methods=['POST'])
 def add_url():
-    originalUrl = request.get_json()
+    data = request.get_json()
 
     try:
-        link = UrlShortener(original_url = originalUrl['url'])
+        originalUrl = data['url']
+        if not data['url'].startswith("http://"):
+            originalUrl = "http://" + data['url']
+
+        link = UrlShortener(original_url = originalUrl)
         db.session.add(link)
         db.session.commit()
         return jsonify(
             {
                 "data" : {
-                    "old_url" : originalUrl['url'],
+                    "old_url" : data['url'],
                     "new_url" : link.short_url
                 },
-                "message": f"{originalUrl['url']} has been successful shorten!!"
+                "message": f"{data['url']} has been successful shorten!!"
             }
         ), 200
 
@@ -67,15 +71,21 @@ def get_urls_stat():
 ### Start of API point for redirect to original route ###
 
 
-@url_shortener_blueprint.route("/<short_url>")
+@url_shortener_blueprint.route("/<short_url>", methods=["GET"])
 def redirect_to_original_url(short_url):
     url = UrlShortener.query.filter_by(short_url=short_url).first_or_404()
     url.visits = url.visits + 1
     db.session.commit()
-    return redirect(url.original_url)
+    return jsonify(
+        {
+            "original_url" : url.original_url,
+            "message":"test"
+        }
+    ), 200
 
  
 ### End of API points for redirect to original route ###
+
 
 
 
