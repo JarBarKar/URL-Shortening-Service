@@ -19,6 +19,12 @@ To run this project, you will need to update the following environment variables
 
 `DB_ACCOUNT_PASSWORD` : <mySQL password>
 
+** Chances if env variables cannot be detected **
+
+Please navigate to ./App/settings.py, edit SQLALCHEMY_DATABASE_URI to config for the DB database connection.
+Replace {os.environ.get("DB_ACCOUNT_ID")} with DB account ID and {os.environ.get("DB_ACCOUNT_PASSWORD")} with DB password. <blank if needed>
+Change hostname and DB port number if required.
+
 
 ## Requirements
 
